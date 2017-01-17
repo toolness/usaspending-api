@@ -181,38 +181,166 @@ class Award(DataSourceTrackedModel):
     latest_award_transaction = property(__get_latest_transaction)  # models.ForeignKey('AwardAction')
 
     @staticmethod
-    def get_or_create_summary_award(piid=None, fain=None, uri=None, parent_award_id=None):
-        # If an award transaction's ID is a piid, it's contract data
-        # If the ID is fain or a uri, it's financial assistance. If the award transaction
-        # has both a fain and a uri, fain takes precedence.
+    def get_or_create_contract_award(awarding_agency, recipient, piid, parent_award_id=None):
+        """
+        Look for a contract award that matches the parameters, or create one if it doesn't exist.
+
+        Input parameters:
+            awarding_agency: agency object associated with the award transaction
+            recipient: the recipient object associated with the award transaction
+            piid: the award transaction's piid (procurement identifier)
+            parent_award_id (optional): the award transaction's parent award id (this is
+                relevant for sub-awards)
+
+            The following combination of attributes makes up a unique contract award:
+            - piid
+            - parent_award_id (referred to as idv piid in legacy data)
+            - awarding sub tier agency code
+            - recipient entity id (e.g., DUNS, legal entity id)
+        """
         q_kwargs = {}
-        for i in [(piid, "piid"), (fain, "fain"), (uri, "uri")]:
-            if i[0]:
-                q_kwargs[i[1]] = i[0]
-                if parent_award_id:
-                    q_kwargs["parent_award__" + i[1]] = parent_award_id
-                else:
-                    q_kwargs["parent_award"] = None
 
-                # Now search for it
-                # Do we want to log something if the the query below turns up
-                # more than one award record?
-                summary_award = Award.objects.all().filter(Q(**q_kwargs)).first()
-                if summary_award:
-                    return summary_award
-                else:
-                    parent_award = None
-                    if parent_award_id:
-                        # If we have a parent award id, recursively get/create the award for it
-                        parent_award = Award.get_or_create_summary_award(**{i[1]: parent_award_id})
-                    # Now create the award record for this award transaction
-                    summary_award = Award(**{i[1]: i[0], "parent_award": parent_award})
-                    summary_award.save()
-                    return summary_award
+        q_kwargs['piid'] = piid
+        q_kwargs['awarding_agency__subtier_agency__subtier_code'] = awarding_agency.subtier_agency.subtier_code
+        q_kwargs['recipient'] = recipient
+        if parent_award_id:
+            q_kwargs['parent_award__piid'] = parent_award_id
+        else:
+            q_kwargs['parent_award'] = None
 
-        raise ValueError(
-            'Unable to find or create an award with the provided information: piid={}, fain={}, uri={}, parent_id={}'.format(
-             piid, fain, uri, parent_award_id))
+        # Look for a matching award
+        # Do we want to log something if the the query below turns up
+        # more than one award record?
+        contract_award = Award.objects.all().filter(Q(**q_kwargs)).first()
+        if contract_award:
+            return contract_award
+        else:
+            parent_award = None
+            if parent_award_id:
+                # If we have a parent award id, recursively get/create the award for it
+                parent_award = Award.get_or_create_contract_award(**{
+                    'piid': parent_award_id,
+                    'awarding_agency': awarding_agency,
+                    'recipient': recipient})
+            # Award not found, so create one
+            contract_award = Award(**{
+                'piid': piid,
+                'awarding_agency': awarding_agency,
+                'recipient': recipient,
+                'parent_award': parent_award
+            })
+            contract_award.save()
+            return contract_award
+
+    @staticmethod
+    def get_or_create_financial_assistance_award(awarding_agency, recipient=None, fain=None, uri=None):
+        """
+        Look for a financial_assistance award that matches the parameters, or create one if it doesn't exist.
+
+        Input parameters:
+            awarding_agency: agency object associated with the award transaction
+            recipient (optional): the recipient object associated with the award transaction
+            aggregate_flag (optional): when true, indicates an aggregate award
+            fain: the award transaction's fain (federal award identification number)
+            uri: the transaction's uri
+
+            The following combination of attributes makes up a unique financial assistance award
+            - fain or uri (if both are specified, fain takes precedence)
+            - uri
+            - awarding sub tier agency code
+            - recipient entity id (e.g., DUNS, legal entity id), applicable to non-aggregate awards only
+        """
+        q_kwargs = {}
+
+        q_kwargs['awarding_agency__subtier_agency__subtier_code'] = awarding_agency.subtier_agency.subtier_code
+        q_kwargs['recipient'] = recipient
+        if fain:
+            q_kwargs['fain'] = fain
+        elif uri:
+            q_kwargs['uri'] = uri
+        else:
+            raise ValueError('Financial assistance transaction must have either a fain or a uri')
+
+        # Look for a matching award
+        # Do we want to log something if the the query below turns up
+        # more than one award record?
+        financial_assistance_award = Award.objects.all().filter(Q(**q_kwargs)).first()
+        if financial_assistance_award:
+            return financial_assistance_award
+        else:
+            # Award not found, so create one
+            financial_assistance_award = Award(**{
+                'uri': uri,
+                'fain': fain,
+                'awarding_agency': awarding_agency,
+                'recipient': recipient,
+            })
+            financial_assistance_award.save()
+            return financial_assistance_award
+
+    @staticmethod
+    def get_or_create_financial_award(awarding_agency, piid=None, fain=None, uri=None, parent_award_id=None):
+        """
+        Look for an award record that "fuzzy" matches a more limited set
+        of information. We need to do this, for example, when loading financial
+        award records from the broker, since those records don't have
+        awarding subtier agency and receipient information.
+        """
+        info = None
+
+        q_kwargs = {'awarding_agency': awarding_agency}
+        if piid is not None:
+            q_kwargs['piid'] = piid
+            if parent_award_id is not None:
+                q_kwargs['parent_award__piid'] = parent_award_id
+            else:
+                q_kwargs['parent_award'] = None
+        elif fain is not None:
+                q_kwargs['fain'] = fain
+        elif uri is not None:
+                q_kwargs['uri'] = uri
+        else:
+            raise ValueError(
+                'Unable to find or create financial award record with the provided information: piid={}, '
+                'fain={}, uri={}, parent_id={}'.format(piid, fain, uri, parent_award_id))
+
+        # Look for a corresponding award record. We sort by recipient to make
+        # sure the more "complete" award records that match are at the top
+        # of the list.
+        # todo: update criteria for choosing between multiple "fuzzy" matching awards when we get more info
+        financial_award = Award.objects.all().filter(Q(**q_kwargs)).order_by('recipient')
+        if financial_award.count() == 1:
+            # do we want to return info about this scenario
+            financial_award = financial_award[0]
+        elif financial_award.count() > 1:
+            # there are multiple award records that match the current award info + agency
+            # use the first one and return some info
+            financial_award = financial_award[0]
+            info = (
+                'Found multiple potential award matches and chose award record {}.'
+                'File C award data: piid={}, parent_award_id={},fain={}, uri={}, cgac={}.'.format(
+                    financial_award.pk, piid, parent_award_id, fain, uri,
+                    awarding_agency__toptier_agency.cgac_code
+                ))
+        else:
+            # No potential award amounts found, so create one
+            parent_award = None
+            if parent_award_id:
+                # If we have a parent award id, recursively get/create the award for it
+                parent_award = Award.get_or_create_financial_award(**{
+                    'awarding_agency': awarding_agency,
+                    'piid': parent_award_id})
+            financial_award = Award(**{
+                'piid': piid,
+                'awarding_agency': awarding_agency,
+                'fain': fain,
+                'uri': uri,
+                'parent_award': parent_award
+            })
+            financial_award.save()
+            return financial_award
+
+        return financial_award, info
 
     class Meta:
         db_table = 'awards'

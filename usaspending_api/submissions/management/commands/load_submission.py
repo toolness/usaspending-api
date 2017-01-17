@@ -169,24 +169,40 @@ class Command(BaseCommand):
         award_financial_data = dictfetchall(db_cursor)
         self.logger.info('Acquired award financial data for ' + str(submission_id) + ', there are ' + str(len(award_financial_data)) + ' rows.')
 
+        # When loading C records, we try to map them to an award record (or create one if it doesn't
+        # already exist). To do that, we need some agency information, so grab the top tier
+        # awarding agency (i.e., the submission's CGAC). We don't have info about the awarding
+        # sub-tier agency on the C record, so we'll set it to unknown when setting up an agency
+        # object to use in the award search.
+        # fix the .first() below--we shouldn't have duplicate CGACs in the toptier agency table
+        awarding_toptier_agency = ToptierAgency.objects.filter(cgac_code=submission_data['cgac_code']).first()
+        unknown_subtier_agency = SubtierAgency.objects.filter(subtier_code='UNKN').first()
+
         for row in award_financial_data:
             account_balances = None
-            try:
-                # Check and see if there is an entry for this TAS
-                treasury_account = get_treasury_appropriation_account_tas_lookup(row.get('tas_id'), db_cursor)
-                if treasury_account is None:
-                    raise Exception('Could not find appropriation account for TAS: ' + row['tas'])
-                account_balances = AppropriationAccountBalances.objects.get(treasury_account_identifier=treasury_account)
-                # Find the award that this award transaction belongs to. If it doesn't exist, create it.
-                award = Award.get_or_create_summary_award(
-                    piid=row.get('piid'),
-                    fain=row.get('fain'),
-                    uri=row.get('uri'),
-                    parent_award_id=row.get('parent_award_id'))
-                award.latest_submission = submission_attributes
-                award.save()
-            except:
-                continue
+            # Check and see if there is an entry for this TAS
+            treasury_account = get_treasury_appropriation_account_tas_lookup(row.get('tas_id'), db_cursor)
+            if treasury_account is None:
+                raise Exception('Could not find appropriation account for TAS: ' + row['tas'])
+            account_balances = AppropriationAccountBalances.objects.get(treasury_account_identifier=treasury_account)
+
+            # Find the award that this award transaction belongs to. If it doesn't exist, create it.
+            # we didn't find any potential award matches, so create one
+            submission_awarding_agency, agency_created = Agency.objects.get_or_create(
+                toptier_agency=awarding_toptier_agency,
+                subtier_agency=unknown_subtier_agency,
+                office_agency=None
+            )
+            award, info = Award.get_or_create_financial_award(
+                submission_awarding_agency,
+                piid=row.get('piid'),
+                fain=row.get('fain'),
+                uri=row.get('uri'),
+                parent_award_id=row.get('parent_award_id')
+            )
+            if info is not None:
+                self.logger.info('Submission {} File C award_financial_id = '
+                        '{}: {}'.format(row.get('submission_id'), row.get('award_financial_id'), info))
 
             award_financial_data = FinancialAccountsByAwards()
 
@@ -261,19 +277,26 @@ class Command(BaseCommand):
             # Create the place of performance location
             pop_location, created = get_or_create_location(place_of_performance_field_map, row)
 
+            # Get the awarding and funding agencies
+            awarding_agency = Agency.objects.filter(
+                toptier_agency__cgac_code=row['awarding_agency_code'],
+                subtier_agency__subtier_code=row["awarding_sub_tier_agency_c"]).first()
+            funding_agency = Agency.objects.filter(
+                toptier_agency__cgac_code=row['funding_agency_code'],
+                subtier_agency__subtier_code=row["funding_sub_tier_agency_co"]).first()
+
             # Find the award that this award transaction belongs to. If it doesn't exist, create it.
-            award = Award.get_or_create_summary_award(
-                piid=row.get('piid'),
+            award = Award.get_or_create_financial_assistance_award(
+                awarding_agency=awarding_agency,
+                recipient=legal_entity,
                 fain=row.get('fain'),
-                uri=row.get('uri'),
-                parent_award_id=row.get('parent_award_id'))
+                uri=row.get('uri')
+            )
 
             fad_value_map = {
                 "award": award,
-                "awarding_agency": Agency.objects.filter(toptier_agency__cgac_code=row['awarding_agency_code'],
-                                                         subtier_agency__subtier_code=row["awarding_sub_tier_agency_c"]).first(),
-                "funding_agency": Agency.objects.filter(toptier_agency__cgac_code=row['funding_agency_code'],
-                                                        subtier_agency__subtier_code=row["funding_sub_tier_agency_co"]).first(),
+                "awarding_agency": awarding_agency,
+                "funding_agency": funding_agency,
                 "recipient": legal_entity,
                 "place_of_performance": pop_location,
                 "submission": submission_attributes,
@@ -328,19 +351,26 @@ class Command(BaseCommand):
             # Create the place of performance location
             pop_location, created = get_or_create_location(place_of_performance_field_map, row)
 
+            # Get the awarding and funding agencies
+            awarding_agency = Agency.objects.filter(
+                toptier_agency__cgac_code=row['awarding_agency_code'],
+                subtier_agency__subtier_code=row["awarding_sub_tier_agency_c"]).first()
+            funding_agency = Agency.objects.filter(
+                toptier_agency__cgac_code=row['funding_agency_code'],
+                subtier_agency__subtier_code=row["funding_sub_tier_agency_co"]).first()
+
             # Find the award that this award transaction belongs to. If it doesn't exist, create it.
-            award = Award.get_or_create_summary_award(
+            award = Award.get_or_create_contract_award(
+                awarding_agency=awarding_agency,
+                recipient=legal_entity,
                 piid=row.get('piid'),
-                fain=row.get('fain'),
-                uri=row.get('uri'),
-                parent_award_id=row.get('parent_award_id'))
+                parent_award_id=row.get('parent_award_id')
+            )
 
             procurement_value_map = {
                 "award": award,
-                "awarding_agency": Agency.objects.filter(toptier_agency__cgac_code=row['awarding_agency_code'],
-                                                         subtier_agency__subtier_code=row["awarding_sub_tier_agency_c"]).first(),
-                "funding_agency": Agency.objects.filter(toptier_agency__cgac_code=row['funding_agency_code'],
-                                                        subtier_agency__subtier_code=row["funding_sub_tier_agency_co"]).first(),
+                "awarding_agency": awarding_agency,
+                "funding_agency": funding_agency,
                 "recipient": legal_entity,
                 "place_of_performance": pop_location,
                 'submission': submission_attributes,
@@ -510,7 +540,6 @@ def get_or_create_location(location_map, row):
 def store_value(model_instance_or_dict, field, value):
     if value is None:
         return
-    # print('Loading ' + str(field) + ' with ' + str(value))
     if isinstance(model_instance_or_dict, dict):
         model_instance_or_dict[field] = value
     else:

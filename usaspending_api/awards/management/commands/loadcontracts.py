@@ -190,9 +190,13 @@ class Command(BaseCommand):
         return maj_agency_cat.split(' ')[0].split(':')[0]
 
     def create_or_get_award(self, row):
+        awarding_agency = self.get_agency(row["contractingofficeagencyid"])
+        # reeds refactored so we don't hit db twice for recipient
+        recipient = self.create_or_get_recipient(row)
         piid = row.get("piid", None)
         parent_award_id = row.get("idvpiid", None)
-        award = Award.get_or_create_summary_award(piid=piid, fain=None, uri=None, parent_award_id=parent_award_id)
+        award = Award.get_or_create_contract_award(
+            awarding_agency, recipient, piid=piid, parent_award_id=parent_award_id)
         return award
 
 
