@@ -1,11 +1,13 @@
-from django.core.management.base import BaseCommand, CommandError
-from usaspending_api.accounts.models import TreasuryAppropriationAccount
-from usaspending_api.common.threaded_data_loader import ThreadedDataLoader
-from datetime import datetime
-import os
 import csv
 import logging
+import os
+from datetime import datetime
+
 import django
+from django.core.management.base import BaseCommand, CommandError
+
+from usaspending_api.accounts.models import TreasuryAppropriationAccount
+from usaspending_api.common.threaded_data_loader import ThreadedDataLoader
 
 
 class Command(BaseCommand):

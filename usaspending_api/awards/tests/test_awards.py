@@ -1,7 +1,7 @@
-import pytest
 import json
 from datetime import date
 
+import pytest
 from model_mommy import mommy
 from rest_framework import status
 

@@ -1,8 +1,8 @@
 import os
 
+import pytest
 from django.conf import settings
 from django.core.management import call_command
-import pytest
 
 from usaspending_api.awards.management.commands import loadfinancialassistance
 

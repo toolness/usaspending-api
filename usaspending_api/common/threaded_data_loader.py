@@ -1,12 +1,13 @@
+import csv
+import json
+import logging
+import multiprocessing
+from multiprocessing import JoinableQueue, Process
+
+from django import db
 from django.conf import settings
 from django.db import connection
 from retrying import retry
-from multiprocessing import Process, JoinableQueue
-from django import db
-import multiprocessing
-import logging
-import csv
-import json
 
 
 # This class is a threaded data loader

@@ -1,9 +1,10 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.test import Client
-import os
-from django.core.serializers.json import json, DjangoJSONEncoder
 import logging
+import os
+
 import django
+from django.core.management.base import BaseCommand, CommandError
+from django.core.serializers.json import DjangoJSONEncoder, json
+from django.test import Client
 
 
 class Command(BaseCommand):

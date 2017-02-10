@@ -6,9 +6,8 @@ from django.core.management.base import BaseCommand
 import usaspending_api.awards.management.commands.helpers as h
 from usaspending_api.awards.models import Award, Procurement
 from usaspending_api.common.threaded_data_loader import ThreadedDataLoader
-from usaspending_api.references.models import LegalEntity
+from usaspending_api.references.models import Agency, LegalEntity
 from usaspending_api.submissions.models import SubmissionAttributes
-from usaspending_api.references.models import Agency
 
 
 class Command(BaseCommand):

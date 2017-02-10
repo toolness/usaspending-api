@@ -1,12 +1,19 @@
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from usaspending_api.common.api_request_utils import DataQueryHandler, GeoCompleteHandler, AutoCompleteHandler
-from usaspending_api.references.models import Location, Agency, LegalEntity
-from usaspending_api.references.serializers import LocationSerializer, AgencySerializer, LegalEntitySerializer
-from usaspending_api.common.mixins import FilterQuerysetMixin, ResponseMetadatasetMixin
-from usaspending_api.common.views import DetailViewSet
 import json
+
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from usaspending_api.common.api_request_utils import (AutoCompleteHandler,
+                                                      DataQueryHandler,
+                                                      GeoCompleteHandler)
+from usaspending_api.common.mixins import (FilterQuerysetMixin,
+                                           ResponseMetadatasetMixin)
+from usaspending_api.common.views import DetailViewSet
+from usaspending_api.references.models import Agency, LegalEntity, Location
+from usaspending_api.references.serializers import (AgencySerializer,
+                                                    LegalEntitySerializer,
+                                                    LocationSerializer)
 
 
 class LocationEndpoint(APIView):

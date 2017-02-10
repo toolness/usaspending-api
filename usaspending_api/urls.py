@@ -14,11 +14,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf import settings
-from django.conf.urls import url, include
-from usaspending_api import views as views
-from django.views.generic import TemplateView
+from django.conf.urls import include, url
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
 
+from usaspending_api import views as views
 
 urlpatterns = [
     url(r'^status/', views.StatusView.as_view()),

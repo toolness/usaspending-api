@@ -1,9 +1,10 @@
 from django.db import models
+
 from usaspending_api.accounts.models import AppropriationAccountBalances
-from usaspending_api.references.models import RefProgramActivity
-from usaspending_api.references.models import RefObjectClassCode
-from usaspending_api.submissions.models import SubmissionAttributes
 from usaspending_api.common.models import DataSourceTrackedModel
+from usaspending_api.references.models import (RefObjectClassCode,
+                                               RefProgramActivity)
+from usaspending_api.submissions.models import SubmissionAttributes
 
 
 class FinancialAccountsByProgramActivityObjectClass(DataSourceTrackedModel):

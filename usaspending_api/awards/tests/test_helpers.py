@@ -1,7 +1,8 @@
 import pytest
 from model_mommy import mommy
 
-from usaspending_api.awards.management.commands import helpers, loadcontracts, loadfinancialassistance
+from usaspending_api.awards.management.commands import (helpers, loadcontracts,
+                                                        loadfinancialassistance)
 from usaspending_api.references.models import Location
 
 

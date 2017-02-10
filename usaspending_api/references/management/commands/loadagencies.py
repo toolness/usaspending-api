@@ -1,9 +1,12 @@
-from django.core.management.base import BaseCommand, CommandError
-from usaspending_api.references.models import ToptierAgency, SubtierAgency, OfficeAgency, Agency
-import os
 import csv
 import logging
+import os
+
 import django
+from django.core.management.base import BaseCommand, CommandError
+
+from usaspending_api.references.models import (Agency, OfficeAgency,
+                                               SubtierAgency, ToptierAgency)
 
 
 class Command(BaseCommand):

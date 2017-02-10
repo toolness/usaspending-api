@@ -3,7 +3,10 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+
 from usaspending_api.common.helpers import FY_PG_FUNCTION_DEF
+
+
 # I don't like reaching between apps this way, but don't see
 # a better place to put a cross-app function definition
 

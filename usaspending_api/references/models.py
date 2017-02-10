@@ -2,8 +2,8 @@ import logging
 
 from django.db import models
 from django.db.models import Q
-from usaspending_api.common.models import DataSourceTrackedModel
 
+from usaspending_api.common.models import DataSourceTrackedModel
 
 LEGAL_ENTITY_BUSINESS_TYPES = (
     ("A", "State government"),

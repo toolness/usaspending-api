@@ -1,6 +1,7 @@
 from django.db import models
-from usaspending_api.submissions.models import SubmissionAttributes
+
 from usaspending_api.common.models import DataSourceTrackedModel
+from usaspending_api.submissions.models import SubmissionAttributes
 
 
 # Table #3 - Treasury Appropriation Accounts.

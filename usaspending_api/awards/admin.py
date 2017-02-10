@@ -1,5 +1,7 @@
 from django.contrib import admin
-from usaspending_api.awards.models import FinancialAccountsByAwardsTransactionObligations
+
+from usaspending_api.awards.models import \
+    FinancialAccountsByAwardsTransactionObligations
 
 
 @admin.register(FinancialAccountsByAwardsTransactionObligations)

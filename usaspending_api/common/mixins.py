@@ -1,8 +1,11 @@
 from collections import OrderedDict
+
 from django.db.models import Avg, Count, F, Max, Min, Sum
 from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 
-from usaspending_api.common.api_request_utils import FilterGenerator, FiscalYear, ResponsePaginator
+from usaspending_api.common.api_request_utils import (FilterGenerator,
+                                                      FiscalYear,
+                                                      ResponsePaginator)
 from usaspending_api.common.exceptions import InvalidParameterException
 
 

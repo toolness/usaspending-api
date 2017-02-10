@@ -1,6 +1,7 @@
 from django.contrib import admin
-from usaspending_api.accounts.models import TreasuryAppropriationAccount
-from usaspending_api.accounts.models import AppropriationAccountBalances
+
+from usaspending_api.accounts.models import (AppropriationAccountBalances,
+                                             TreasuryAppropriationAccount)
 
 
 @admin.register(TreasuryAppropriationAccount)

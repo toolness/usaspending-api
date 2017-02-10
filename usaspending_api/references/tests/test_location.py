@@ -1,8 +1,8 @@
 import os
 
+import pytest
 from django.conf import settings
 from model_mommy import mommy
-import pytest
 
 from usaspending_api.common.api_request_utils import GeoCompleteHandler
 from usaspending_api.references.models import Location

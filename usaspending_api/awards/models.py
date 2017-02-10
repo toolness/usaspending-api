@@ -2,9 +2,11 @@ from django.db import models
 from django.db.models import F, Q, Sum
 
 from usaspending_api.accounts.models import TreasuryAppropriationAccount
-from usaspending_api.submissions.models import SubmissionAttributes
-from usaspending_api.references.models import RefProgramActivity, RefObjectClassCode, Agency, Location, LegalEntity
 from usaspending_api.common.models import DataSourceTrackedModel
+from usaspending_api.references.models import (Agency, LegalEntity, Location,
+                                               RefObjectClassCode,
+                                               RefProgramActivity)
+from usaspending_api.submissions.models import SubmissionAttributes
 
 AWARD_TYPES = (
     ('U', 'Unknown Type'),

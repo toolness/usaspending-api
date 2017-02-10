@@ -1,9 +1,9 @@
+import os
+
+import markdown
 from django import template
 from django.conf import settings
-import os
-import markdown
 from mdx_gfm import GithubFlavoredMarkdownExtension
-
 
 register = template.Library()
 

@@ -1,5 +1,5 @@
-from usaspending_api.references.models import *
 from usaspending_api.common.serializers import LimitableSerializer
+from usaspending_api.references.models import *
 
 
 class ToptierAgencySerializer(LimitableSerializer):

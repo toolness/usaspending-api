@@ -1,8 +1,9 @@
-from django.core.management import call_command
-from django.core.serializers.json import json
 import logging
 import os
+
 import pytest
+from django.core.management import call_command
+from django.core.serializers.json import json
 
 
 @pytest.fixture(scope="session")

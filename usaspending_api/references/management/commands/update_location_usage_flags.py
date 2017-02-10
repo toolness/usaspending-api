@@ -1,9 +1,12 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Count, Case, F, Value, When, Q
-from usaspending_api.references.models import Location, LegalEntity
-from usaspending_api.awards.models import Award, Procurement, FinancialAssistanceAward
 import logging
+
 import django
+from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Case, Count, F, Q, Value, When
+
+from usaspending_api.awards.models import (Award, FinancialAssistanceAward,
+                                           Procurement)
+from usaspending_api.references.models import LegalEntity, Location
 
 
 class Command(BaseCommand):

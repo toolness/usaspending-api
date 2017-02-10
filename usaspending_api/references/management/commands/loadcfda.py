@@ -1,10 +1,12 @@
-from django.core.management.base import BaseCommand, CommandError
-from usaspending_api.references.models import CFDAProgram
-from datetime import datetime
-import os
 import csv
 import logging
+import os
+from datetime import datetime
+
 import django
+from django.core.management.base import BaseCommand, CommandError
+
+from usaspending_api.references.models import CFDAProgram
 
 
 class Command(BaseCommand):

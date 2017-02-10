@@ -1,8 +1,8 @@
 from collections import OrderedDict
-from datetime import date, time, datetime
+from datetime import date, datetime, time
 
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.postgres.search import SearchVector
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
 from django.utils import timezone
 

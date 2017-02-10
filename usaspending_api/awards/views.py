@@ -1,14 +1,16 @@
-from collections import namedtuple
 import json
+from collections import namedtuple
 
 from rest_framework import status
-from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from usaspending_api.awards.models import Award, Procurement
-from usaspending_api.awards.serializers import AwardSerializer, TransactionSerializer
+from usaspending_api.awards.serializers import (AwardSerializer,
+                                                TransactionSerializer)
 from usaspending_api.common.api_request_utils import AutoCompleteHandler
-from usaspending_api.common.mixins import FilterQuerysetMixin, ResponseMetadatasetMixin
+from usaspending_api.common.mixins import (FilterQuerysetMixin,
+                                           ResponseMetadatasetMixin)
 from usaspending_api.common.views import AggregateView, DetailViewSet
 
 AggregateItem = namedtuple('AggregateItem', ['field', 'func'])

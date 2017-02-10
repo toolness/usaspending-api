@@ -1,10 +1,15 @@
-from django.core.management.base import BaseCommand, CommandError
-from usaspending_api.references.models import RefCityCountyCode, RefCountryCode, RefObjectClassCode, RefProgramActivity
-from usaspending_api.common.threaded_data_loader import ThreadedDataLoader
-import os
 import csv
 import logging
+import os
+
 import django
+from django.core.management.base import BaseCommand, CommandError
+
+from usaspending_api.common.threaded_data_loader import ThreadedDataLoader
+from usaspending_api.references.models import (RefCityCountyCode,
+                                               RefCountryCode,
+                                               RefObjectClassCode,
+                                               RefProgramActivity)
 
 
 class Command(BaseCommand):

@@ -1,9 +1,11 @@
-from usaspending_api.references.models import CFDAProgram
-from usaspending_api.references.management.commands.loadcfda import load_cfda
-from django.core.management import call_command
-from django.conf import settings
 import os
+
 import pytest
+from django.conf import settings
+from django.core.management import call_command
+
+from usaspending_api.references.management.commands.loadcfda import load_cfda
+from usaspending_api.references.models import CFDAProgram
 
 
 # Scoping to module would save time, but db object is function-scoped

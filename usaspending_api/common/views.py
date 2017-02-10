@@ -2,8 +2,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 from usaspending_api.common.api_request_utils import ResponsePaginator
-from usaspending_api.common.serializers import AggregateSerializer
 from usaspending_api.common.mixins import AggregateQuerysetMixin
+from usaspending_api.common.serializers import AggregateSerializer
 
 
 class AggregateView(AggregateQuerysetMixin,

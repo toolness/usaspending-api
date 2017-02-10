@@ -1,6 +1,7 @@
 from django.contrib import admin
-from usaspending_api.references.models import RefProgramActivity
-from usaspending_api.references.models import RefObjectClassCode
+
+from usaspending_api.references.models import (RefObjectClassCode,
+                                               RefProgramActivity)
 
 
 # Register your models here.
