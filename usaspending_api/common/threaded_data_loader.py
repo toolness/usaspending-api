@@ -1,15 +1,11 @@
-from django.db.models import Q
 from django.conf import settings
 from django.db import connection
 from retrying import retry
 from multiprocessing import Process, JoinableQueue
 from django import db
 import multiprocessing
-import time
 import logging
 import csv
-import queue
-import sys
 import json
 
 

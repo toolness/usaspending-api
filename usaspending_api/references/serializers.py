@@ -1,4 +1,3 @@
-from rest_framework import serializers
 from usaspending_api.references.models import *
 from usaspending_api.common.serializers import LimitableSerializer
 

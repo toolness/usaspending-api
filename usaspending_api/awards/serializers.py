@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from usaspending_api.awards.models import Award, FinancialAccountsByAwards, FinancialAccountsByAwardsTransactionObligations, FinancialAssistanceAward, Procurement
-from usaspending_api.accounts.serializers import AppropriationAccountBalancesSerializer, TreasuryAppropriationAccountSerializer
+from usaspending_api.accounts.serializers import TreasuryAppropriationAccountSerializer
 from usaspending_api.common.serializers import LimitableSerializer
 from usaspending_api.references.serializers import AgencySerializer, LegalEntitySerializer, LocationSerializer
 from usaspending_api.common.helpers import fy

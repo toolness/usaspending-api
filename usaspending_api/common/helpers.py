@@ -1,5 +1,3 @@
-import datetime
-
 
 def fy(raw_date):
     'Federal fiscal year corresponding to date'

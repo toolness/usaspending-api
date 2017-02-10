@@ -2,7 +2,6 @@ import os
 
 from django.conf import settings
 from django.core.management import call_command
-from model_mommy import mommy
 import pytest
 
 from usaspending_api.awards.management.commands import loadcontracts

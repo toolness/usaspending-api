@@ -1,6 +1,5 @@
 from usaspending_api.accounts.models import TreasuryAppropriationAccount
 from usaspending_api.common.threaded_data_loader import ThreadedDataLoader, cleanse_values
-from django.core.management import call_command
 from django.conf import settings
 import os
 import pytest

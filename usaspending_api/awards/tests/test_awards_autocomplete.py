@@ -4,7 +4,6 @@ import pytest
 from model_mommy import mommy
 from rest_framework import status
 
-from usaspending_api.awards.models import Award
 from usaspending_api.common.tests.autocomplete import check_autocomplete
 
 

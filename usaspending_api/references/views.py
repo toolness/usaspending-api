@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -6,7 +5,7 @@ from usaspending_api.common.api_request_utils import DataQueryHandler, GeoComple
 from usaspending_api.references.models import Location, Agency, LegalEntity
 from usaspending_api.references.serializers import LocationSerializer, AgencySerializer, LegalEntitySerializer
 from usaspending_api.common.mixins import FilterQuerysetMixin, ResponseMetadatasetMixin
-from usaspending_api.common.views import AggregateView, DetailViewSet
+from usaspending_api.common.views import DetailViewSet
 import json
 
 

@@ -8,7 +8,6 @@ from django.utils import timezone
 
 from usaspending_api.common.exceptions import InvalidParameterException
 from usaspending_api.references.models import Location
-from usaspending_api.awards.models import Award
 
 
 class FiscalYear():
